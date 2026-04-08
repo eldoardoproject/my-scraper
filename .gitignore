@@ -1,0 +1,20 @@
+.env
+.env.local
+
+# Dependencies
+node_modules/
+
+# Debug & Test files
+debug_*.js
+test_*.js
+parse_*.js
+*_debug.html
+*_debug.json
+*_js.html
+products_raw.json
+products_parsed.json
+shopee_api.json
+tokopedia_screenshot.png
+
+# Logs
+*.log
