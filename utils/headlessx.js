@@ -1,21 +1,25 @@
-require("dotenv").config();
-const axios = require("axios");
+require('dotenv').config();
+const axios = require('axios');
 
 const client = axios.create({
   baseURL: process.env.HEADLESSX_API_URL,
   headers: {
-    "Content-Type": "application/json",
-    "X-API-Key": process.env.HEADLESSX_API_KEY,
+    'Content-Type': 'application/json',
+    'X-API-Key': process.env.HEADLESSX_API_KEY
   },
-  timeout: 120000,
+  timeout: 300000  // ✅ naik ke 5 menit
 });
 
-async function getHTML(url) {
-  const res = await client.post("/api/website/html", {
+async function getHTML(url, profileId = null) {
+  const body = {
     url,
-    timeout: 30000,
-    waitForTimeout: 12000, // ✅ naik dari 8000 ke 12000
-  });
+    timeout       : 60000,   // ✅ naik ke 60 detik
+    waitForTimeout: 25000    // ✅ naik ke 25 detik
+  };
+
+  if (profileId) body.profileId = profileId;
+
+  const res = await client.post('/api/website/html', body);
   return res.data;
 }
 

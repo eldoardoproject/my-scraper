@@ -84,21 +84,35 @@ async function search(keyword) {
 
 async function detail(url) {
   console.log(`🔍 [Tokopedia] Detail: ${url}`);
-  const res = await getHTML(url);
+  const res  = await getHTML(url);
   const html = res.html || res;
-  const $ = cheerio.load(html);
+  const $    = cheerio.load(html);
+
+  // Ambil gambar asli (bukan SVG placeholder)
+  let image = '';
+  $('[data-testid="PDPImageDetail"] img, [data-testid="PDPImageThumbnail"] img').each((i, el) => {
+    const src = $(el).attr('src') || '';
+    if (src && !src.startsWith('data:')) { // skip SVG placeholder
+      image = src;
+      return false; // stop loop
+    }
+  });
+
+  // Lokasi toko dari footer shop section
+  const locationRaw = $('[data-testid="pdpShipmentV4Content"]').text().trim();
+  // Ambil baris terakhir yang biasanya berisi nama kota
+  const locationLines = locationRaw.split('\n').map(l => l.trim()).filter(Boolean);
+  const location = locationLines[locationLines.length - 1] || '';
 
   return {
-    name: $('[data-testid="lblPDPDetailProductName"]').text().trim(),
-    price: $('[data-testid="lblPDPDetailProductPrice"]').text().trim(),
-    store: $('[data-testid="llbPDPFooterShopName"]').text().trim(),
-    location: $('[data-testid="lblPDPDetailGetProductShopLocation"]')
-      .text()
-      .trim(),
-    rating: $('[data-testid="lblPDPDetailProductRatingNumber"]').text().trim(),
-    sold: $('[data-testid="lblPDPDetailProductSoldCounter"]').text().trim(),
-    image: $('[data-testid="PDPMainImage"]').attr("src") || "",
-    link: url,
+    name     : $('[data-testid="lblPDPDetailProductName"]').text().trim(),
+    price    : $('[data-testid="lblPDPDetailProductPrice"]').text().trim(),
+    store    : $('[data-testid="llbPDPFooterShopName"]').text().trim(),
+    location,
+    rating   : $('[data-testid="lblPDPDetailProductRatingNumber"]').text().trim(),
+    sold     : $('[data-testid="lblPDPDetailProductSoldCounter"]').text().trim(),
+    image,
+    link     : url
   };
 }
 
